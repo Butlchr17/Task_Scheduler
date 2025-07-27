@@ -60,7 +60,6 @@ class Scheduler {
             cout << "Task not found or already completed." << endl;
         }
 
-
         void executeNext() {
             if (tasks.empty()) {
                 return;
@@ -102,6 +101,16 @@ class Scheduler {
                 cout << t -> getName() << " (Priority: " << t -> getPriority() << ")" << endl;
             }
         }
+
+        int getTaskCount() const {
+            int count = 0;
+            for (auto t : tasks) {
+                if(!t -> isCompleted()) {
+                    count ++;
+                }
+            }
+            return count;
+        }
 };
 
 int main() {
@@ -109,7 +118,28 @@ int main() {
     string command;
 
     cout << "Task Scheduler Commands: add <name> <priority>, execute, list, remove <name>, quit" << endl;
+    
+    // test samples
+    try {
+        scheduler.addTask("Task1", 3);
+        scheduler.addTask("Task2", 1);
+        scheduler.addTask("Task3", 5);
+        Scheduler.addTask("Invalid", 11); // Should throw an error
+    }
+    catch (const invalid_argument& e) {
+        cout << "Caught expected error: " << e.what() << endl;
+    }
+        cout << "Initial list:" << endl;
 
+        scheduler.listTasks();
+        scheduler.executeNext();
+        scheduler.executeNext();
+        scheduler.removeTask("Task2");
+
+        cout << "After execution:" << endl;
+        scheduler.listTasks(); // Should be empty
+        cout << "Remaining tasks: " << scheduler.getTaskCount() << endl // 0
+    
     while (true) {
         cout << "> ";
         cin >> command;
@@ -136,26 +166,17 @@ int main() {
             cin >> name;
             scheduler.removeTask(name);
         }
+        else if (command == "count") {
+            scheduler.getTaskCount();
+        }
         else if (command == "quit") {
             break;
         }
         else {
             cout << "Invalid command." << endl;
         }
+
     }
-
-    // // test samples
-    // scheduler.addTask("Task1", 3);
-    // scheduler.addTask("Task2", 1);
-    // scheduler.addTask("Task3", 5);
-
-    // cout << "Initial list:" << endl;
-
-    // scheduler.listTasks();
-    // scheduler.executeNext();
-
-    // cout << "After execution:" << endl;
-    // scheduler.listTasks();
 
     return 0;
 }
