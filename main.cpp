@@ -41,9 +41,25 @@ class Scheduler {
         }
 
         void addTask(string name, int priority) {
+            if (priority < 1 || priority > 10) {
+                throw invalid_argument("Priority must be between 1 and 10.");
+            }            
             Task* t = new Task(name, priority);
             tasks.push_back(t);
         }
+
+        void removeTask(string name) {
+            for (auto it = tasks.begin(); it != tasks.end(); ++it) {
+                if ((*it ) -> getName() == name && !(*it) -> isCompleted()) {
+                    delete *it;
+                    tasks.erase(it);
+                    cout << "Removed: " << name << endl;
+                    return;
+                }
+            }
+            cout << "Task not found or already completed." << endl;
+        }
+
 
         void executeNext() {
             if (tasks.empty()) {
@@ -90,19 +106,56 @@ class Scheduler {
 
 int main() {
     Scheduler scheduler;
+    string command;
 
-    // test samples
-    scheduler.addTask("Task1", 3);
-    scheduler.addTask("Task2", 1);
-    scheduler.addTask("Task3", 5);
+    cout << "Task Scheduler Commands: add <name> <priority>, execute, list, remove <name>, quit" << endl;
 
-    cout << "Initial list:" << endl;
+    while (true) {
+        cout << "> ";
+        cin >> command;
 
-    scheduler.listTasks();
-    scheduler.executeNext();
+        if (command == "add") {
+            string name;
+            int priority;
+            cin >> name >> priority;
+            try {
+                scheduler.addTask(name, priority);
+            }
+            catch (const invalid_argument& e) {
+                cout << "Error: " << e.what() << endl;
+            }
+        }
+        else if (command == "execute") {
+            scheduler.executeNext();
+        }
+        else if (command == "list") {
+            scheduler.listTasks();
+        }
+        else if (command == "remove") {
+            string name;
+            cin >> name;
+            scheduler.removeTask(name);
+        }
+        else if (command == "quit") {
+            break;
+        }
+        else {
+            cout << "Invalid command." << endl;
+        }
+    }
 
-    cout << "After execution:" << endl;
-    scheduler.listTasks();
+    // // test samples
+    // scheduler.addTask("Task1", 3);
+    // scheduler.addTask("Task2", 1);
+    // scheduler.addTask("Task3", 5);
+
+    // cout << "Initial list:" << endl;
+
+    // scheduler.listTasks();
+    // scheduler.executeNext();
+
+    // cout << "After execution:" << endl;
+    // scheduler.listTasks();
 
     return 0;
 }
